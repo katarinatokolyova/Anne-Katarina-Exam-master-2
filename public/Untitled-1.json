@@ -1,0 +1,18 @@
+[
+    {
+      "id": 3,
+      "eventname": "Halloween",
+      "eventDescription": "xx",
+      "createdAt": "2018-05-13T11:08:12.792Z",
+      "updatedAt": "2018-05-13T11:08:12.792Z",
+      "dormitoryId": 1
+    },
+    {
+      "id": 4,
+      "eventname": "Nummer to",
+      "eventDescription": "Her sker en masse!",
+      "createdAt": "2018-05-13T11:10:25.116Z",
+      "updatedAt": "2018-05-13T11:10:25.116Z",
+      "dormitoryId": 1
+    }
+  ]

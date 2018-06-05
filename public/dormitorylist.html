@@ -1,0 +1,197 @@
+  <!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Dormitory list</title>
+  <link href="stylesheet.css" rel="stylesheet" type="text/css" media="all" />
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+    crossorigin="anonymous">
+</head>
+
+<body>
+  <!-- Searching within the dormitories -->  
+    <div id="domitorylist-window">
+    </div>
+    <div class="btn btn-primary" id="search-window">
+        <h5 class="modal-title">Search Results: <span class"text-secondary" id="search-window-string"></span>
+        </h5>
+        <hr>
+        <div class="dormitories" id="search-window-results"></div>
+    <form id="search-form">
+        <h5 class="modal-title" id="exampleModalLabel">Search for dormitory</h5>
+        <input type="text" class="form-control" id="search-input" placeholder="Search for dormitories here...">
+        <button type="submit" class="close" data-dismiss="modal" aria-label="Close">Search</button>
+      </form>
+    </div>
+  
+  
+     <!-- Button trigger modal -->
+    <button type="button" class="btn btn-primary" id="createdormitorybutton" data-toggle="modal" data-target="#exampleModal">Add dormitory</button>
+  
+  <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Add dormitory</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="dormitoryForm">
+            <div class="form-group">
+              <label for="dormitoryName" class="col-form-label">Dormitory name:</label>
+              <input type="text" class="form-control" id="dormitoryName">
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Add dormitory</button>
+        </div>
+        </form>
+        
+      </div>
+    </div>
+  </div>
+
+  <h1>LIST OF DORMITORIES</h1>
+  <div id="menu">
+    <ul id="dormitoryList">
+      <li>Please wait...</li>
+    </ul>
+  </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="dormitorylist.js"></script>
+
+
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+    crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+    crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+    crossorigin="anonymous"></script>
+
+  <script>
+    let dormitoryList= null;
+
+    const eleDormitoryList = document.querySelector('#dormitoryList');
+
+    // Let fetch existing dormitories
+    function fetchDormitories(cbReady) {
+      // Make a request to server to get list of Dormitories
+      fetch('/api/dormitories', {})
+                .then(response => response.json())
+                .then(response => {
+                  dormitoryList = response;
+                    cbReady(dormitoryList);
+                })
+    }
+
+    function renderDormitories(list) {
+        let htmlList = '';
+        list.map((dormitory, i) => {
+          htmlList+= `<li><a href="eventlist.html?dormitry=${dormitory.id}" accesskey="${i+1}" style="text-decoration:none">${dormitory.dormitoryname}</a></li>`;
+        })
+        eleDormitoryList.innerHTML = htmlList;
+    }
+
+
+    fetchDormitories(renderDormitories);
+
+  function searchDormitories(searchString) {
+    let search = new RegExp(searchString, 'i')
+
+
+    let result = dormitoryList.filter(d=> {
+      console.log(d)
+      return d.dormitoryname.search(search) > -1
+    })
+
+    return result
+  }
+
+    // Select our header on the page, the H1 element
+    let pageHeader = document.querySelector('h1')
+    console.log('H1 element', pageHeader)
+
+    // Select our list's items
+    let dormitories = document.querySelectorAll('#dormitoryList li')
+    console.log('All dormitories', dormitories)
+
+    // Add event to our form
+    // First we select our form
+    let form = document.querySelector('#dormitoryForm')
+
+    // Next we add a event listener to override default behaviour
+    form.addEventListener('submit', function (dormitory) {
+      // Make sure not to submit form like usual
+      dormitory.preventDefault();
+      // Select out input field
+      let eleDormitoryName = document.querySelector('#dormitoryName');
+      let dormitoryName = eleDormitoryName.value;
+
+      createDormitory(dormitoryName);
+    })
+
+    document.querySelector('#search-form').addEventListener('submit', function(evt) {
+      evt.preventDefault()
+
+
+      let input = document.querySelector("#search-input")
+      let value = input.value
+
+      if(value == '' ) {
+          document.querySelector('#domitorylist-window').classList.remove('hidden')
+          document.querySelector('#search-window').classList.add('hidden')
+          renderDormitories(dormitoryList)
+          return
+      }
+
+      document.querySelector('#domitorylist-window').classList.add('hidden')
+      document.querySelector('#search-window').classList.remove('hidden')
+      document.querySelector('#search-window-string').innerHTML = value
+
+
+      let results = searchDormitories(value)
+      renderDormitories(results)
+
+      console.log(results)
+
+    })
+
+    function createDormitory(dormitoryName) {
+            let options = {
+                method: 'post',
+                credentials: 'include',
+                headers: {
+                    'content-type': 'application/json'
+                },
+                body: JSON.stringify({
+                  dormitoryName: dormitoryName
+                })
+            }
+
+            fetch('/api/dormitory', options)
+                .then(response => response.json())
+                .then(response => {
+                    if (response.status == 'OK') {
+                        document.location.href = './eventlist.html'
+                    } else {
+                        alert(response.message)
+                    }
+                })
+        }
+
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<title>About the event</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inconsolata">
+<link rel="stylesheet" href="stylesheet.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/css/bootstrap.min.css">
+<style>
+  body,
+  html {
+    height: 100%;
+    font-family: "Inconsolata", sans-serif;
+  }
+
+  .bgimg {
+    background-position: center;
+    background-size: cover;
+    background-image: url("frontpage.jpg");
+    min-height: 75%;
+  }
+
+  .white-box {
+    background-color: white;
+    color: black;
+  }
+
+  .menu {
+    display: none;
+  }
+</style>
+<!-- Header with image -->
+<header class="bgimg w3-display-container w3-grayscale-min" id="home">
+ 
+  <div class="w3-display-middle w3-center">
+    <span class="white-box" style="font-size:90px" id="eventName"></span>
+  </div>
+ 
+</header>
+
+
+<!-- About Container -->
+<div id="about">
+  <div>
+    <br>
+    <h2>Details about the Event</h2>
+    <p id="eventDescription"></p>
+  </div>
+</div>
+
+<!-- Menu Container -->
+<div class="w3-container" id="menu">
+  <div class="w3-content" style="max-width:700px">
+
+    <h5 class="w3-center w3-padding-48">
+      <span class="w3-tag w3-wide">Comment on the event</span>
+    </h5>
+
+    <div class="container-fluid">
+      <div class="row main">
+        <div class="col-9" id="comment-window">
+          <div class="row commentInput bg-light">
+            <div class="col align-self-center">
+              <form id="comment-form">
+                <div class="input-group">
+                  <input type="text" class="form-control" id="eventComment" placeholder="Comment about the event here">
+                  <div class="input-group-append">
+                    <button class="btn btn-primary">Comment!</button>
+                  </div>
+                </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+      <!-- End page content -->
+    </div>
+
+
+
+    <!-- Include our javascript code -->
+    <!-- <script src="/socket.io/socket.io.js"></script> -->
+    <!-- <script src="app-with-api.js"></script> -->
+
+    <script>
+      var eventInfo = null;
+      var commentInfo = null;
+
+      // TODO: make this finding of dormitryId more serious - ATM it is naive :-)
+      var rawSearch = document.location.search;
+      var params = rawSearch.replace('?', '').split('&')
+      var eventId = params[0].split('=')[1];
+      var dormitryId = params[1].split('=')[1];
+
+      // 
+      const eleCommentList = document.querySelector('#commentList')
+      const eleParticiption = document.querySelector('#eventForm')
+
+      // fetch event for a given dormitry
+      function fetchEvent(cbReady) {
+        fetch(`/api/dormitories/${dormitryId}/event/${eventId}`, {})
+          .then(response => response.json())
+          .then(response => {
+            eventInfo = response;
+            cbReady(eventInfo);
+          })
+      }
+
+      function renderEvent(eventInfo) {
+        const eleEventName = document.querySelector('#eventName');
+        console.log('eventInfo: ', eventInfo);
+
+        eleEventName.innerText = eventInfo.eventname;
+        const eleEventDescription = document.querySelector('#eventDescription');
+        eleEventDescription.innerText = eventInfo.eventDescription;
+       
+        console.log(eventInfo);
+      }
+
+      fetchEvent(renderEvent);
+
+      getCommentsForEvent(renderComments);
+
+      // fetch comment for a given event
+      function fetchComment(cbReady) {
+
+        fetch(`/api/events/${eventID}/comment/${commentId}`, {})
+          .then(response => response.json())
+          .then(response => {
+            commentInfo = response;
+            cbReady(commentInfo);
+          })
+      }
+
+      function renderComment(commentInfo) {
+        const eleEventComment = document.querySelector('#eventComment');
+        console.log('commentInfo: ', commentInfo);
+
+        eleEventComment.innerText = eventInfo.eventComment;
+
+        console.log(commentInfo);
+      }
+
+fetchComment(renderComment);
+
+      //Modal
+      // Add comment to our event
+      // First we select our form
+      let form = document.querySelector('#comment-form')
+
+      // Next we add a event listener to override default behaviour
+      form.addEventListener('submit', function (comment) {
+        // Make sure not to submit form like usual
+        event.preventDefault();
+
+        let eleEventComment = document.querySelector('#eventComment');
+        let text = eleEventComment.value;
+
+        sendComment(text);
+
+      })
+
+      function sendComment(text) {
+        let options = {
+          method: 'post',
+          credentials: 'include',
+          headers: {
+            'content-type': 'application/json'
+          },
+          body: JSON.stringify({
+            text
+          })
+        }
+
+        fetch(`/api/events/${eventId}/comment`, options)
+          .then(response => response.json())
+          .then(response => {
+            console.log('event response', response);
+            if (response.status == 'OK') {
+              document.location.reload();
+            } else {
+              alert(response.message)
+            }
+          })
+      }
+
+    function getCommentsForEvent(renderEventsCb) {
+        let options = {
+          method: 'get',
+          credentials: 'include',
+          headers: {
+            'content-type': 'application/json'
+          }
+        }
+
+        fetch(`/api/events/${eventId}/comments?id=${eventId}`, options)
+          .then(response => response.json())
+          .then(response => {
+            // comment er ændret til text
+            console.log('comments ', response)
+            renderEventsCb(response)
+          })
+      }
+
+      function renderComments(response) {
+
+      }
+
+    //Connecting to an external API - unsplash
+  function getRandom () {
+    let url = `https://unsplash.com//photos/random`;
+    let options = {
+      method: 'get',
+      headers: {
+        "client_id": "27a66ed8c9068d3f0a2280f3c165a166f48da905577b8e92e3b1d51ec1aec0a6",
+        //"client_secret": "27a66ed8c9068d3f0a2280f3c165a166f48da905577b8e92e3b1d51ec1aec0a6", // this part should only be used for request to the API that is NOT public accessible.
+        "content-type": 'application/json',
+      }
+    }
+    fetch(url, options)
+      .then(response => response.json())
+      .then(results => {
+          console.log(results)
+        // do something with the results. The results should be in JSON format
+      })
+  }
+    
+    </script>
+    </body>
+
+</html>
+</body>
+
+</html>
