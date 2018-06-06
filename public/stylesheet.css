@@ -6,11 +6,11 @@ body {
 body {
 	margin: 0px;
 	padding: 0px;
-	background: linear-gradient(lightgrey, white);
+	background: linear-gradient(lightgrey);
 	font-family: "Verdana", "Geneva", "sans-serif";
 	font-size: 12pt;
 	font-weight: 300;
-	color: whitesmoke;
+	color: lightgrey;
 }
 
 #eventList {
@@ -20,6 +20,10 @@ body {
 #dormitoryList {
 	background: lightgrey;
 }
+#about{
+	padding: 3em 0em;
+}
+
 
 h1,
 h2 {

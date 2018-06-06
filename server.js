@@ -264,16 +264,16 @@ app.post('/api/dormitory', (req, res) => {
 app.put('/api/dormitory/:id', (req, res) => { 
     const id = req.params.id;
     const updates = req.body.updates;
-    db.User.find({
+    db.Dormitory.find({
         where: {
             id:id
         }
     })
-    .then(user => {
-        return user.updateAttributes(updates)
+    .then(dormitory => {
+        return dormitory.updateAttributes(updates)
     })
-    .then(updateUser => {
-        res.json(updateUser)
+    .then(updateDormitory => {
+        res.json(updateDormitory)
     })
 
  })
@@ -281,13 +281,13 @@ app.put('/api/dormitory/:id', (req, res) => {
 //Endpoint for deleting a dormitory by id 
 app.delete('/api/dormitory/:id', (req,res) => {
     const id =  req.params.id;
-    db.User.destroy({
+    db.Dormitory.destroy({
         where: {
             id: id
         }
     })
-    .then(deleteUser => {
-        res.json(deleteUser)
+    .then(deleteDormitory => {
+        res.json(deleteDormitory)
    })
 })
 
@@ -368,6 +368,37 @@ app.post('/api/dormitory/:id/event', async (req, res) => {
         .then(dorm => {
             res.json(dorm)
         })
+})
+
+//Endpoint for updating event by id
+app.put('/api/event/:id', (req, res) => { 
+    const id = req.params.id;
+    const updates = req.body.updates;
+    db.Event.find({
+        where: {
+            id:id
+        }
+    })
+    .then(event => {
+        return event.updateAttributes(updates)
+    })
+    .then(updateEvent => {
+        res.json(updateEvent)
+    })
+
+ })
+
+//Endpoint for deleting an event by id 
+app.delete('/api/event/:id', (req,res) => {
+    const id =  req.params.id;
+    db.Event.destroy({
+        where: {
+            id: id
+        }
+    })
+    .then(deleteEvent => {
+        res.json(deleteEvent)
+   })
 })
 
 

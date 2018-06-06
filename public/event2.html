@@ -26,18 +26,35 @@
     color: black;
   }
 
+.center {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+}
   .menu {
     display: none;
-  }
+}
+
+
 </style>
+
 <!-- Header with image -->
+<header  id="home">
+  <img class="center" id="homePhoto" src="" alt="Random photo">
+  <div class="w3-display-middle w3-center">
+    <span class="white-box" style="font-size:90px" id="eventName"></span>
+  </div>
+
+</header>
+<!-- Header with image
 <header class="bgimg w3-display-container w3-grayscale-min" id="home">
  
   <div class="w3-display-middle w3-center">
     <span class="white-box" style="font-size:90px" id="eventName"></span>
   </div>
  
-</header>
+</header> -->
 
 
 <!-- About Container -->
@@ -54,7 +71,7 @@
   <div class="w3-content" style="max-width:700px">
 
     <h5 class="w3-center w3-padding-48">
-      <span class="w3-tag w3-wide">Comment on the event</span>
+      <span class="w3-tag w3-wide">Comment on the event here!</span>
     </h5>
 
 
@@ -87,6 +104,7 @@
     <!-- <script src="app-with-api.js"></script> -->
 
     <script>
+      getRandomPicture();
       var eventInfo = null;
       var commentInfo = null;
 
@@ -224,32 +242,32 @@
       function renderComments(list) {
         let htmlList = '';
         list.map((comment, i) => {
-          htmlList+= `<li>${comment.comment} skrevet af ${comment.userId} - dato ${comment.createdAt}</li>`;
+          htmlList+= `<li>${comment.comment} : Written by user with ID ${comment.userId} at ${comment.createdAt}</li>`;
         })
         commentsToEvent.innerHTML = htmlList;
     }
     getCommentsForEvent(renderComments)
 
 
-    //Connecting to an external API - unsplash
-  module.getRandom = function () {
-    let url = `https://unsplash.com//photos/random`;
-    let options = {
-      method: 'get',
-      headers: {
-        "client_id": "27a66ed8c9068d3f0a2280f3c165a166f48da905577b8e92e3b1d51ec1aec0a6",
-        //"client_secret": "27a66ed8c9068d3f0a2280f3c165a166f48da905577b8e92e3b1d51ec1aec0a6", // this part should only be used for request to the API that is NOT public accessible.
-        "content-type": 'application/json',
-      }
-    }
-    fetch(url, options)
-      .then(response => response.json())
-      .then(results => {
-          console.log("random"+results)
-        // do something with the results. The results should be in JSON format
-      })
-  }
-  module.getRandom()
+    //  Getting a random picture of a meal
+    function getRandomPicture () {
+        let url = `https://spoonacular-recipe-food-nutrition-v1.p.mashape.com/recipes/random?limitLicense=false&number=1`;
+        let options = {
+          method: 'get',
+          headers: {
+            "X-Mashape-Key": "8JjZG4xR9rmsh4rky1POhsezdRkQp1faNEdjsndxjV8KBtLS7a",
+            "content-type": 'application/json',
+          }
+        }
+        fetch(url, options)
+          .then(response => response.json())
+          .then(results => {
+            let image = results.recipes[0].image;
+            let header = document.getElementById('homePhoto');
+            header.setAttribute("src", `${image}`);
+          })
+          }
+
     </script>
     </body>
 

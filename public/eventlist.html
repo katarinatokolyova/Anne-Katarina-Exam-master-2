@@ -69,13 +69,13 @@
   <script>
 let eventList= null;
 
-
+// TODO: make this finding of dormitryId more serious - ATM it is naive :-)
 var rawSearch = document.location.search;
 var dormitryId = rawSearch.replace('?','').split('=')[1];
 
 const eleEventList = document.querySelector('#eventList');
 
-// fetch existing dormitories
+// fetch exsisting dorimitories
 function fetchEvents(cbReady) {
 
   fetch(`/api/dormitories/${dormitryId}/events`, {})
@@ -119,51 +119,39 @@ fetchEvents(renderEvents);
       // Make sure not to submit form like usual
       event.preventDefault();
 
+      //selecting our input field
       let eleEventName = document.querySelector('#eventname');
       let eventName = eleEventName.value;
       let eleEventDescription = document.querySelector('#eventdescription');
       let eventDescription = eleEventDescription.value;
 
       createEvent(eventName, eventDescription);
-
-      // Select out input field
-//      let inputField = document.querySelector('#newEvent')
-      // Create new <li> element
-  //    let newListElement = document.createElement('li')
-      // Set the text of the <li> element
-    //  newListElement.innerHTML = inputField.value
-      // Select the list we want to add our new item to
-      //let eventList = document.querySelector('#eventList')
-      // Add our element to the list
-     // eventList.appendChild(newListElement)
-      // Delete content of the input field
-     // inputField.value = ''
     })
 
     function createEvent(eventName, eventDescription) {
-            let options = {
-                method: 'post',
-                credentials: 'include',
-                headers: {
-                    'content-type': 'application/json'
-                },
-                body: JSON.stringify({
-                  eventName,
-                  eventDescription
-                })
-            }
+      let options = {
+        method: 'post',
+        credentials: 'include',
+        headers: {
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify({
+        eventName,
+        eventDescription
+       })
+      }
 
-            fetch(`/api/dormitory/${dormitryId}/events`, options)
-                .then(response => response.json())
-                .then(response => {
-                  console.log('event response', response);
-                    if (response.status == 'OK') {
-                        document.location.href = './eventlist.html'
-                    } else {
-                        alert(response.message)
-                    }
-                })
-        }
+      fetch(`/api/dormitory/${dormitryId}/event`, options)
+        .then(response => response.json())
+        .then(response => {
+         console.log('event response', response);
+           if (response.status == 'OK') {
+            document.location.href = './eventlist.html'
+           } else {
+             alert(response.message)
+          }
+        })
+      }
 
   </script>
 </body>
