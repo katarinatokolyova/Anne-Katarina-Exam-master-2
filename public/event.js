@@ -93,7 +93,8 @@ function EventComment (comment, user)
 
 
 //method for writing a comment
-module.sendComment = function (comment) {
+module.sendComment2 = function (comment) {
+    console.log("inde i sendcomment")
     // // The "credentials" option makes sure that the browser's cookies
     // are sent back and forth during a request
     // Please refer to the fetch() docs: https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
@@ -109,7 +110,11 @@ module.sendComment = function (comment) {
     .then(response => response.json())
     .then(response => {
         if (response.status != 'OK') {
-        }      
+            console.log("not okay: "+respnse)
+        }
+        else {
+            console.log("okay: "+respnse)
+        }    
     }) 
 } 
 

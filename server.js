@@ -63,7 +63,7 @@ const http = require('http').Server(app)
 
 // Stuff to do when a user (socket) connects to the site
 io.on('connection', socket => {
-    console.log('Socket connected', socket.id)
+    console.log('Socket connected', socket.io)
 
     socket.emit('debug message', 'Socket connected to server!')
     // Take the user object from the session
@@ -393,7 +393,6 @@ app.post('/api/events/:id/comment', requireAuthentication, (req, res) => {
         text
     } = req.body
 
-
     let schema = {
         text: Joi.string().required()
     }
@@ -409,7 +408,7 @@ app.post('/api/events/:id/comment', requireAuthentication, (req, res) => {
     // Create comment and take the userId from the session
     // Addid the userId associates the comment to the user
     db.Comment.create({
-        text,
+        comment: text,
         userId: req.session.user.id,
         eventId: req.params.id
     }, {
@@ -425,7 +424,6 @@ app.post('/api/events/:id/comment', requireAuthentication, (req, res) => {
     .then(comment => {
         //Emit the newly created message to all sockets
         io.emit('new comment', comment)
-
         // Return a HTTP 201 response
         return res.status(201).json({
             status: 'OK',

@@ -57,6 +57,7 @@
       <span class="w3-tag w3-wide">Comment on the event</span>
     </h5>
 
+
     <div class="container-fluid">
       <div class="row main">
         <div class="col-9" id="comment-window">
@@ -75,7 +76,7 @@
       </div>
     </div>
 
-
+    <div id="commentsToEvent"></div>
       <!-- End page content -->
     </div>
 
@@ -92,72 +93,28 @@
       // TODO: make this finding of dormitryId more serious - ATM it is naive :-)
       var rawSearch = document.location.search;
       var params = rawSearch.replace('?', '').split('&')
+      
       var eventId = params[0].split('=')[1];
       var dormitryId = params[1].split('=')[1];
+      //var commentId = 20;
+      //console.log("eventid: "+eventId);
+      //console.log("dormitryId: "+dormitryId);
+      const commentsToEvent = document.querySelector('#commentsToEvent');
 
-      // 
-      const eleCommentList = document.querySelector('#commentList')
-      const eleParticiption = document.querySelector('#eventForm')
-
-      // fetch event for a given dormitry
-      function fetchEvent(cbReady) {
-        fetch(`/api/dormitories/${dormitryId}/event/${eventId}`, {})
-          .then(response => response.json())
-          .then(response => {
-            eventInfo = response;
-            cbReady(eventInfo);
-          })
-      }
-
-      function renderEvent(eventInfo) {
-        const eleEventName = document.querySelector('#eventName');
-        console.log('eventInfo: ', eventInfo);
-
-        eleEventName.innerText = eventInfo.eventname;
-        const eleEventDescription = document.querySelector('#eventDescription');
-        eleEventDescription.innerText = eventInfo.eventDescription;
-       
-        console.log(eventInfo);
-      }
-
-      fetchEvent(renderEvent);
-
-      getCommentsForEvent(renderComments);
-
-      // fetch comment for a given event
-      function fetchComment(cbReady) {
-
-        fetch(`/api/events/${eventID}/comment/${commentId}`, {})
-          .then(response => response.json())
-          .then(response => {
-            commentInfo = response;
-            cbReady(commentInfo);
-          })
-      }
-
-      function renderComment(commentInfo) {
-        const eleEventComment = document.querySelector('#eventComment');
-        console.log('commentInfo: ', commentInfo);
-
-        eleEventComment.innerText = eventInfo.eventComment;
-
-        console.log(commentInfo);
-      }
-
-fetchComment(renderComment);
-
-      //Modal
+           //Modal
       // Add comment to our event
       // First we select our form
-      let form = document.querySelector('#comment-form')
+     
+      let commentform = document.querySelector('#comment-form')
+      //alert(form);
 
       // Next we add a event listener to override default behaviour
-      form.addEventListener('submit', function (comment) {
+      commentform.addEventListener('submit', event => {
         // Make sure not to submit form like usual
-        event.preventDefault();
-
         let eleEventComment = document.querySelector('#eventComment');
         let text = eleEventComment.value;
+        //console.log(text);
+        event.preventDefault();
 
         sendComment(text);
 
@@ -181,13 +138,70 @@ fetchComment(renderComment);
             console.log('event response', response);
             if (response.status == 'OK') {
               document.location.reload();
+              //console.log(response);
             } else {
               alert(response.message)
             }
+
           })
       }
 
-    function getCommentsForEvent(renderEventsCb) {
+      const eleCommentList = document.querySelector('#commentList')
+      const eleParticiption = document.querySelector('#eventForm')
+
+      // fetch event for a given dormitry
+      function fetchEvent(cbReady) {
+        fetch(`/api/dormitories/${dormitryId}/event/${eventId}`, {})
+          .then(response => response.json())
+          .then(response => {
+            eventInfo = response;
+            cbReady(eventInfo);
+            //var commentId = Object.values(response[0])[0];
+      
+          })
+      }
+
+      function renderEvent(eventInfo) {
+        const eleEventName = document.querySelector('#eventName');
+        console.log('eventInfo: ', eventInfo);
+
+        eleEventName.innerText = eventInfo.eventname;
+        const eleEventDescription = document.querySelector('#eventDescription');
+        eleEventDescription.innerText = eventInfo.eventDescription;
+       
+        console.log(eventInfo);
+      }
+
+      fetchEvent(renderEvent);
+
+      getCommentsForEvent(renderComments);
+
+      // fetch comment for a given event
+      function fetchComment(cbReady) {
+
+        fetch(`/api/events/${eventId}/comment/${commentId}`, {})
+          .then(response => response.json())
+          .then(response => {
+            commentInfo = response;
+            cbReady(commentInfo);
+          })
+      }
+
+      function renderComment(commentInfo) {
+        const eleEventComment = document.querySelector('#eventComment');
+        console.log('commentInfo: ', commentInfo);
+
+        //eleEventComment.innerText = eventInfo.eventComment;
+        eleEventComment.innerText = commentInfo.eventComment;
+        
+
+        console.log(commentInfo);
+      }
+
+      fetchComment(renderComment);
+
+
+      function getCommentsForEvent(renderEventsCb) {
         let options = {
           method: 'get',
           credentials: 'include',
@@ -200,17 +214,25 @@ fetchComment(renderComment);
           .then(response => response.json())
           .then(response => {
             // comment er ændret til text
-            console.log('comments ', response)
+            console.log('comments ', response);
+            
+            //console.log('comments ', Object.values(response[0])[0]);
             renderEventsCb(response)
           })
+          
       }
+      function renderComments(list) {
+        let htmlList = '';
+        list.map((comment, i) => {
+          htmlList+= `<li>${comment.comment} skrevet af ${comment.userId} - dato ${comment.createdAt}</li>`;
+        })
+        commentsToEvent.innerHTML = htmlList;
+    }
+    getCommentsForEvent(renderComments)
 
-      function renderComments(response) {
-
-      }
 
     //Connecting to an external API - unsplash
-  function getRandom () {
+  module.getRandom = function () {
     let url = `https://unsplash.com//photos/random`;
     let options = {
       method: 'get',
@@ -223,11 +245,11 @@ fetchComment(renderComment);
     fetch(url, options)
       .then(response => response.json())
       .then(results => {
-          console.log(results)
+          console.log("random"+results)
         // do something with the results. The results should be in JSON format
       })
   }
-    
+  module.getRandom()
     </script>
     </body>
 
